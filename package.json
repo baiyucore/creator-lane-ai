@@ -1,0 +1,58 @@
+{
+  "name": "creator",
+  "version": "0.0.1",
+  "description": "Monorepo：Next.js 前端 + NestJS 后端，pnpm + Turborepo",
+  "private": true,
+  "packageManager": "pnpm@10.34.2",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "web:dev": "turbo run dev --filter=@monorepo/frontend",
+    "api:dev": "turbo run dev --filter=@monorepo/backend",
+    "build": "turbo run build",
+    "web:build": "turbo run build --filter=@monorepo/frontend",
+    "api:build": "turbo run build --filter=@monorepo/backend",
+    "typecheck": "turbo run typecheck",
+    "lint": "eslint --cache . --fix",
+    "lint:ci": "eslint --cache .",
+    "format": "prettier --write .",
+    "format:ci": "prettier --check .",
+    "clean": "turbo run clean",
+    "verify": "pnpm lint:ci && pnpm format:ci && pnpm typecheck && pnpm build",
+    "commit": "git-cz",
+    "lint-staged": "lint-staged",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
+    "@typescript-eslint/eslint-plugin": "^8.61.0",
+    "@typescript-eslint/parser": "^8.61.0",
+    "commitizen": "^4.3.1",
+    "cz-git": "^1.13.1",
+    "eslint": "catalog:",
+    "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
+    "prettier": "catalog:",
+    "rimraf": "^6.0.1",
+    "turbo": "^2.9.18",
+    "typescript": "catalog:"
+  },
+  "lint-staged": {
+    "{apps,packages,tests}/**/*.{ts,tsx}": [
+      "eslint --cache --fix --max-warnings=0 --no-warn-ignored",
+      "prettier --write"
+    ],
+    "**/*.{js,jsx,mjs,cjs,json,md,css,scss,yaml,yml}": "prettier --write"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  }
+}

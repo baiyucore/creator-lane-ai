@@ -1,0 +1,72 @@
+---
+description: Common utilities and config modules (backend)
+globs:
+  - 'apps/backend/src/common/**/*.ts'
+  - 'apps/backend/src/config/**/*.ts'
+---
+
+## 目标
+
+- `common/`: 共享模块、DTOs、枚举、辅助函数、集成(Redis/MQ/Database)
+- `config/`: 环境配置工厂，服务通过ConfigService消费
+- 框架无关，可跨模块复用
+- 禁止使用 `@nestjs/common` 的 Logger
+
+## 文件布局
+
+- `common/dto/`: 纯DTO类，带`@ApiProperty`和验证装饰器
+- `common/enum/`: 配置key、事件名、错误码枚举
+- `common/types/`: TS接口/类型
+- `common/utils/`: 无副作用辅助函数、常量、转换
+- `common/fastify/`: Fastify扩展
+- `common/database/`: 数据库客户端、事务辅助、seed脚本
+- `common/redis/`: Redis客户端、缓存/pubsub辅助
+- `common/mq/`: 消息队列客户端
+- `config/`: 一个域一个文件（如`redis.config.ts`）
+
+## 编码规范
+
+DTOs:
+
+- 显式类型和验证装饰器(`class-validator`)
+- `@ApiProperty`描述字段含义、类型、可空
+
+Enums:
+
+- PascalCase命名，SCREAMING_SNAKE_CASE成员
+
+```ts
+export enum EmailConfigEnum {
+  EMAIL_HOST = 'EMAIL_HOST',
+  EMAIL_PORT = 'EMAIL_PORT',
+}
+```
+
+Utils:
+
+- 纯函数、无副作用、有单测
+- 文件kebab-case，函数camelCase
+
+Config:
+
+- 工厂返回类型化对象，无副作用
+- 必需key用`configService.getOrThrow`
+- 启动时用Joi/Zod验证env
+
+```ts
+export default (configService: ConfigService): RedisConfig => ({
+  host: configService.getOrThrow<string>(RedisConfigEnum.REDIS_HOST),
+  port: Number(configService.getOrThrow(RedisConfigEnum.REDIS_PORT)),
+});
+```
+
+错误处理:
+
+- 必须抛NestJS异常(BadRequestException/ConflictException/InternalServerErrorException等)
+- 不抛原始错误或泄露堆栈
+
+测试:
+
+- 所有utils和config工厂必须有单测
+- Mock ConfigService
+- Redis/MQ/数据库访问层包装为provider以便mock

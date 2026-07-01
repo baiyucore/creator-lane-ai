@@ -1,0 +1,55 @@
+---
+description: Core module - 装饰器、过滤器、守卫、拦截器 (backend)
+globs:
+  - 'apps/backend/src/core/**/*.ts'
+---
+
+## 目标
+
+`core/` 为全应用增强NestJS行为：装饰器(Swagger/元数据)、异常过滤器、认证/权限守卫、响应/超时/指标拦截器。
+
+- 运行时：Fastify
+- 禁止使用 `@nestjs/common` 的 Logger
+- 只含框架级代码，无业务逻辑
+- 单文件限制：600行
+
+## 文件命名
+
+- 一个类一个文件，kebab-case命名
+- 后缀：`*.decorator.ts`, `*.filter.ts`, `*.guard.ts`, `*.interceptor.ts`
+- 类名：PascalCase + 后缀（如`AuthGuard`）
+- 严格类型，避免any，用unknown+类型窄化
+
+## Decorators
+
+- 提供Swagger辅助（如`ApiResponseWithDto`）
+- 提供元数据装饰器（如`Permissions`）用`Reflector`
+- 无I/O，只添加元数据
+
+## Filters
+
+全局过滤器必须：
+- 返回安全的结构化响应：`{ code, message, timestamp, data? }`
+- 清理敏感数据（密码/token/secret字段，authorization/cookie/x-api-key头）
+- 未知错误转换为500，不泄露堆栈
+- 记录指标（如Prometheus）
+- 使用注入的LoggerService
+
+## Guards
+
+- AuthGuard: 验证token/session，附加`user`到`request.user`
+- Permission/Role Guards: 通过Reflector读取元数据并强制检查
+- 抛出`UnauthorizedException`/`ForbiddenException`
+
+## Interceptors
+
+- TransformInterceptor: 包装成功响应为`{ code: 0, message: 'OK', data }`
+- TimeoutInterceptor: 超时抛`RequestTimeoutException`
+- Metrics/Tracing: 测量延迟，设置header
+- 仅必要时用FastifyReply
+
+## 测试
+
+- 隔离测试每个类
+- Mock `ArgumentsHost`/`CallHandler`
+- 断言响应结构、清理行为、状态码

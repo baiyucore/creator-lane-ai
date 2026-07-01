@@ -1,0 +1,179 @@
+---
+description: NestJS API 开发规范 - Controller、Service 和响应格式
+globs:
+  - 'apps/backend/src/api/**/controller/*.ts'
+  - 'apps/backend/src/api/**/service/*.ts'
+  - 'apps/backend/src/api/**/services/**/*.ts'
+  - 'apps/backend/src/api/**/dto/*.ts'
+---
+
+## 响应格式规范
+
+Service 直接返回 ResponseDto，Controller 直接返回：
+
+```typescript
+// Service
+async getItems(query: QueryDto): Promise<ResponseDto<ItemListDto>> {
+  return { code: 200, message: 'OK', data: { list, total, page, page_size } };
+}
+// Controller
+async getItems(@Query() query: QueryDto): Promise<ResponseDto<ItemListDto>> {
+  return this.service.getItems(query);
+}
+```
+
+标准结构：`{ code: number, message: string, data: T }`
+
+数据格式：
+- 单对象：`data: { id, title, created_at }`
+- 数组：`data: [{ id, name }]`
+- 分页列表：`data: { list: [], total, page, page_size }` (必须用list不是items)
+- 空数据：`data: null`
+
+命名规范：必须用 snake_case
+- 正确：page_size, message_count, created_at
+- 错误：pageSize, messageCount, createdAt
+
+查询规范：
+```typescript
+const items = await this.itemRepo.findMany({
+  select: { id: true, title: true, created_at: true }, // 只查需要的
+  where: { is_deleted: false },
+});
+return { model: item.model }; // 不添加默认值，返回null
+```
+
+DTO类型匹配数据库：
+```typescript
+export class ItemDto {
+  @ApiProperty({ nullable: true })
+  model: string | null;
+}
+```
+
+常见错误：
+- Controller包装响应
+- 用items代替list
+- 用驼峰命名
+- 添加默认值
+- DTO类型不匹配
+
+## Controller 层规范
+
+基本原则：
+- 保持精简，只负责路由、参数绑定、委托
+- 所有业务逻辑在Service层
+- 直接返回Service结果，Service抛的异常自动向上传递
+- 禁止使用 `@nestjs/common` 的 Logger
+- 不需要手动try-catch，全局过滤器会捕获所有异常
+
+必需装饰器：
+1. `@ApiTags('feature')`
+2. `@ApiOperation({ summary, description })`
+3. `@ApiResponseWithDto(ResultDto)`
+4. 所有输入用DTO (`@Query()`, `@Body()`, `@Param()`)
+
+示例：
+```typescript
+@ApiTags('items')
+@Controller('items')
+export class ItemController {
+  constructor(private readonly service: ItemService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Get items', description: 'Paginated list' })
+  @ApiResponseWithDto(ItemListDto)
+  async getItems(@Query() query: GetItemsDto): Promise<ResponseDto<ItemListDto>> {
+    return this.service.getItems(query);
+  }
+}
+```
+
+## Service 层规范
+
+基本原则：
+- 负责所有业务逻辑
+- 禁止使用 `@nestjs/common` 的 Logger
+- **必须抛出NestJS类型化异常，禁止用Error**
+- 包装未知错误，不泄露内部信息
+
+文件组织：
+- 主服务：`<feature>.service.ts`
+- 子服务：`services/<area>.service.ts`
+- 测试文件：`*.service.spec.ts`
+- 文件限制：800行，方法60行
+
+**错误处理（必须）：**
+- BadRequestException: 无效参数/状态
+- ForbiddenException/UnauthorizedException: 访问问题
+- NotFoundException: 目标不存在
+- ConflictException: 唯一性/状态冲突
+- InternalServerErrorException: 意外失败
+
+错误处理示例：
+```typescript
+// Service方法必须抛异常
+async getItem(id: string) {
+  const item = await this.itemRepo.findById(id);
+  if (!item) throw new NotFoundException(`Item ${id} not found`); // 必须
+  return item;
+}
+
+// 捕获外部错误并转换
+try {
+  return await this.externalApi.call();
+} catch (error) {
+  throw new InternalServerErrorException('External service failed');
+}
+```
+
+数据访问：
+- 用select只查需要的字段
+- 默认分页
+- 不直接返回ORM实体
+- 避免N+1查询
+- 多写用事务
+
+示例：
+```typescript
+@Injectable()
+export class ItemService {
+  async getItems(dto: QueryDto): Promise<ResponseDto<ItemListDto>> {
+    const items = await this.itemRepo.findMany({
+      select: { id: true, title: true },
+      take: dto.page_size,
+      skip: (dto.page - 1) * dto.page_size,
+    });
+    return {
+      code: 200,
+      message: 'OK',
+      data: { list: items, total, page: dto.page, page_size: dto.page_size },
+    };
+  }
+}
+```
+
+## 检查清单
+
+响应格式：
+- Service返回ResponseDto, Controller直接返回Service结果
+- 用select指定字段，不返回内部字段
+- 不添加默认值，DTO类型匹配数据库
+- 列表用list，分页包含total/page/page_size
+- 用snake_case命名
+
+Controller：
+- 有@ApiTags/@ApiOperation/@ApiResponseWithDto
+- 所有输入用DTO，保持精简无业务逻辑
+- 不用@nestjs/common的Logger
+
+Service：
+- 业务逻辑在Service，文件≤800行，方法≤60行
+- 用select精确查询，抛出类型化异常
+- 不返回ORM实体，避免N+1，多写用事务
+- 不用@nestjs/common的Logger
+
+DTO：
+- 用@ApiProperty，snake_case命名
+- 类型匹配数据库(注意null)
+- 分页用page/page_size，列表用list

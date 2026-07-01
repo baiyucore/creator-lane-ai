@@ -1,0 +1,51 @@
+---
+description: Styles and CSS loading (Vite + React)
+globs:
+  - 'apps/frontend/src/**/*.css'
+  - 'apps/frontend/src/main.tsx'
+  - 'apps/frontend/index.html'
+---
+
+# 纯 React (Vite) 样式架构
+
+适用于 Vite + React，无 Next.js。
+
+## 文件结构建议
+
+- `src/style.css` 或 `src/index.css` — 全局样式入口（在 `main.tsx` 中唯一导入）
+- `src/styles/**` — 可选：按功能拆分的样式（如 `variables.css`、`reset.css`），由全局入口 `@import`
+- 组件/页面级样式 — 使用 CSS Modules（`*.module.css`）或与组件同目录的 CSS，在对应组件内按需 import
+
+## 加载策略
+
+### 全局（main.tsx）
+
+在入口只导入一份全局样式：
+
+```tsx
+// main.tsx
+import './style.css'; // 或 import './index.css'
+```
+
+全局 CSS 内可包含：
+
+- CSS 变量（主题色、间距等）
+- 基础 reset / 字体
+- 若用 Tailwind：`@import 'tailwindcss'` 及主题配置
+
+### 按需加载（组件/路由）
+
+- 仅该页面或组件用到的重型样式（如富文本、图表、代码高亮），在对应组件或懒加载路由里 `import`，避免打进首包。
+- 使用 CSS Modules 时，只在引用该组件的模块图中加载。
+
+## 规则摘要
+
+- 全局样式只在 `main.tsx` 里导入一次，不重复导入 Tailwind 或同一套 reset。
+- 页面/功能专用的大体积 CSS 随路由或组件按需加载。
+- 类名：全局用有前缀或 BEM，组件级优先用 CSS Modules 避免冲突。
+
+## 检查清单
+
+- [ ] `pnpm build` 通过
+- [ ] 首屏不加载未用到的重型 CSS（可看 Network）
+- [ ] 无重复的全局 base 样式

@@ -1,0 +1,91 @@
+---
+description: NestJS 错误处理与日志规范 (backend)
+globs:
+  - 'apps/backend/src/**/*.ts'
+---
+
+## 错误处理规范
+
+必须使用NestJS内置异常，禁止用Error或自定义错误类：
+
+```ts
+// 错误
+throw new Error('User not found');
+
+// 正确
+throw new NotFoundException('User not found');
+throw new BadRequestException('Invalid email format');
+throw new ConflictException({ message: 'Email exists', code: 'EMAIL_CONFLICT' });
+```
+
+异常类型选择：
+
+- BadRequestException (400): 无效输入/验证失败
+- UnauthorizedException (401): 缺少/无效认证
+- ForbiddenException (403): 已认证但无权限
+- NotFoundException (404): 资源不存在
+- ConflictException (409): 重复资源/约束冲突
+- UnprocessableEntityException (422): 格式正确但语义错误
+- InternalServerErrorException (500): 意外错误/外部服务失败
+
+Controller和Service都必须抛出NestJS异常：
+
+```ts
+// Service
+async findUserById(id: string): Promise<User> {
+  const user = await this.repo.findOne({ where: { id } });
+  if (!user) throw new NotFoundException(`User ${id} not found`);
+  return user;
+}
+
+// Controller会自动传递Service抛出的异常
+async getUser(@Param('id') id: string) {
+  return this.service.findUserById(id); // 异常自动向上抛
+}
+```
+
+## 日志规范
+
+禁止使用 `@nestjs/common` 的 Logger：
+
+```ts
+// 禁止
+import { Logger } from '@nestjs/common';
+const logger = new Logger();
+
+// 正确：直接抛异常，全局过滤器会自动记录
+throw new NotFoundException('Resource not found');
+```
+
+全局过滤器自动处理：
+
+- 记录所有异常（请求方法、路径、用户、时间戳）
+- 返回标准响应：`{ code, message, timestamp, data? }`
+- 清理敏感数据（密码、token、API密钥）
+- 记录错误指标
+
+## 最佳实践
+
+错误消息要具体：
+
+```ts
+// 模糊
+throw new BadRequestException('Invalid data');
+// 具体
+throw new BadRequestException('Invalid email: must contain @ symbol');
+```
+
+包含上下文：
+
+```ts
+throw new NotFoundException(`Document ${id} not found`);
+throw new ConflictException(`Email ${email} already exists`);
+```
+
+测试异常：
+
+```ts
+it('should throw NotFoundException', async () => {
+  await expect(service.findUser('invalid')).rejects.toThrow(NotFoundException);
+});
+```
