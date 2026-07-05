@@ -5,9 +5,9 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "nest start --watch",
-    "build": "nest build",
+    "build": "nest build && tsc-alias -p tsconfig.json",
     "start": "nest start",
-    "start:prod": "node dist/main",
+    "start:prod": "cross-env NODE_OPTIONS=protection node dist/main",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
     "clean": "rimraf dist",

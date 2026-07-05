@@ -1,0 +1,5 @@
+export const JwtEnv = {
+  JWT_SECRET: 'JWT_SECRET',
+  JWT_EXPIRES: 'JWT_EXPIRES',
+  JWT_REFRESH_EXPIRES: 'JWT_REFRESH_EXPIRES',
+} as const;

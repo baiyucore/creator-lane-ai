@@ -1,6 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+// import { ConfigService } from '@nestjs/config';
+// import { readConfigEnvOrThrow } from './utils/env';
+// import { parseCorsOrigins } from './utils/cors';
+// import { ServerEnvEnum } from './common/enum/server.env.enum';
+
+// const API_PREFIX = 'api/v1';
+// const CSRF_TOKEN_ROUTE = `/${API_PREFIX}/security/csrf-token`;
+// const CSRF_SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -18,6 +26,11 @@ async function bootstrap() {
       snapshot: true,
     },
   );
+
+  // const configService = app.get(ConfigService);
+  // const corsOrigins = parseCorsOrigins(
+  //   readConfigEnvOrThrow(configService, ServerEnvEnum.CORS_ORIGINS),
+  // );
 
   await app.listen(process.env.PORT ?? 3000);
 }

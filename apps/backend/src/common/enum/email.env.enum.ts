@@ -1,0 +1,8 @@
+export const EmailEnvEnum = {
+  EMAIL_HOST: 'EMAIL_HOST',
+  EMAIL_PORT: 'EMAIL_PORT',
+  EMAIL_SECURE: 'EMAIL_SECURE',
+  EMAIL_USER: 'EMAIL_USER',
+  EMAIL_PASS: 'EMAIL_PASS',
+  EMAIL_FROM: 'EMAIL_FROM',
+} as const;
