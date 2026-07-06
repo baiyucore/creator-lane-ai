@@ -14,6 +14,10 @@
     "build": "turbo run build",
     "web:build": "turbo run build --filter=@monorepo/frontend",
     "api:build": "turbo run build --filter=@monorepo/backend",
+    "infra:up": "docker compose --project-directory apps/backend -f apps/backend/docker-compose.yml up -d",
+    "infra:down": "docker compose --project-directory apps/backend -f apps/backend/docker-compose.yml down",
+    "infra:ps": "docker compose --project-directory apps/backend -f apps/backend/docker-compose.yml ps",
+    "infra:logs": "docker compose --project-directory apps/backend -f apps/backend/docker-compose.yml logs -f",
     "typecheck": "turbo run typecheck",
     "lint": "eslint --cache . --fix",
     "lint:ci": "eslint --cache .",
@@ -53,6 +57,11 @@
   "config": {
     "commitizen": {
       "path": "node_modules/cz-git"
+    }
+  },
+  "pnpm": {
+    "overrides": {
+      "fastify": "5.9.0"
     }
   }
 }

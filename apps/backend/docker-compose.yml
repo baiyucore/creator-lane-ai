@@ -6,13 +6,14 @@ services:
     env_file:
       - .env.development
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-moment}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-moment0802}
+      POSTGRES_USER: ${POSTGRES_USER:-hyt}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hyt0923}
       POSTGRES_DB: ${DATABASE_NAME:-ai_creation_platform_test}
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/postgres-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -h localhost -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
       interval: 10s
@@ -28,7 +29,7 @@ services:
       - .env.development
     environment:
       REDIS_PORT: ${REDIS_PORT:-6379}
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-moment0802}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-hyt0923}
     ports:
       - '127.0.0.1:${REDIS_PORT:-6379}:6379'
     volumes:
@@ -59,8 +60,8 @@ services:
     env_file:
       - .env.development
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-moment}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-moment0802}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-hyt}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-hyt09230}
     command: server /data --console-address ":9001"
     ports:
       - '127.0.0.1:${MINIO_API_PORT:-9000}:9000'
@@ -73,8 +74,8 @@ services:
     env_file:
       - .env.development
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-moment}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-moment0802}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-hyt}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-hyt09230}
     depends_on:
       - minio
     volumes:
@@ -98,7 +99,7 @@ services:
       - clickhouse_logs:/var/log/clickhouse-server
     healthcheck:
       test:
-        ['CMD-SHELL', 'wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1']
+        ['CMD-SHELL', 'wget --no-verbose --tries=1 --spider http://127.0.0.1:8123/ping || exit 1']
       interval: 10s
       timeout: 5s
       retries: 10
@@ -120,9 +121,9 @@ services:
     ports:
       - '127.0.0.1:3030:3030'
     environment: &langfuse-env
-      NEXTAUTH_URL: ${LANGFUSE_NEXTAUTH_URL:-http://127.0.0.1:3000}
-      DATABASE_URL: ${LANGFUSE_DATABASE_URL:-postgresql://moment:moment0802@postgres:5432/langfuse}
-      DIRECT_URL: ${LANGFUSE_DIRECT_URL:-postgresql://moment:moment0802@postgres:5432/langfuse}
+      NEXTAUTH_URL: ${LANGFUSE_NEXTAUTH_URL:-http://127.0.0.1:3001}
+      DATABASE_URL: ${LANGFUSE_DATABASE_URL:-postgresql://hyt:hyt0923@postgres:5432/langfuse}
+      DIRECT_URL: ${LANGFUSE_DIRECT_URL:-postgresql://hyt:hyt0923@postgres:5432/langfuse}
       SALT: ${LANGFUSE_SALT:-replace-with-strong-random-salt}
       ENCRYPTION_KEY: ${LANGFUSE_ENCRYPTION_KEY:-0000000000000000000000000000000000000000000000000000000000000000}
       TELEMETRY_ENABLED: ${LANGFUSE_TELEMETRY_ENABLED:-false}
@@ -131,14 +132,15 @@ services:
       CLICKHOUSE_USER: ${LANGFUSE_CLICKHOUSE_USER:-langfuse}
       CLICKHOUSE_PASSWORD: ${LANGFUSE_CLICKHOUSE_PASSWORD:-langfuse}
       CLICKHOUSE_DB: ${LANGFUSE_CLICKHOUSE_DB:-default}
+      CLICKHOUSE_CLUSTER_ENABLED: ${LANGFUSE_CLICKHOUSE_CLUSTER_ENABLED:-false}
       REDIS_HOST: ${LANGFUSE_REDIS_HOST:-redis}
       REDIS_PORT: ${LANGFUSE_REDIS_PORT:-6379}
-      REDIS_AUTH: ${LANGFUSE_REDIS_AUTH:-moment0802}
+      REDIS_AUTH: ${LANGFUSE_REDIS_AUTH:-hyt0923}
       REDIS_TLS_ENABLED: false
       LANGFUSE_S3_EVENT_UPLOAD_BUCKET: ${LANGFUSE_S3_EVENT_UPLOAD_BUCKET:-wallpaper}
       LANGFUSE_S3_EVENT_UPLOAD_REGION: ${LANGFUSE_S3_EVENT_UPLOAD_REGION:-us-east-1}
-      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: ${LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID:-moment}
-      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY:-moment0802}
+      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: ${LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID:-hyt}
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY:-hyt09230}
       LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: ${LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT:-http://minio:9000}
       LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: true
 
@@ -158,7 +160,7 @@ services:
       langfuse-worker:
         condition: service_started
     ports:
-      - '127.0.0.1:3000:3000'
+      - '127.0.0.1:${LANGFUSE_WEB_PORT:-3001}:3000'
     environment:
       <<: *langfuse-env
       NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-replace-with-strong-random-nextauth-secret}
