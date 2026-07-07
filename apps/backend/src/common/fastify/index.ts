@@ -1,6 +1,6 @@
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyInstance } from 'fastify';
-
+// 注册Fastify插件
 export async function registerFastifyPlugin(
   app: NestFastifyApplication,
   plugin: unknown,

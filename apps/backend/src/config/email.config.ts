@@ -30,21 +30,22 @@ function parseNumber(value: string, key: string): number {
   return num;
 }
 
+// 邮箱配置
 export default function emailConfig(configService: ConfigService): EmailConfig {
   const authUser = readConfigEnvOrThrow(configService, EmailEnvEnum.EMAIL_USER);
 
   return {
-    host: readConfigEnvOrThrow(configService, EmailEnvEnum.EMAIL_HOST),
+    host: readConfigEnvOrThrow(configService, EmailEnvEnum.EMAIL_HOST), // 邮箱服务器地址
     port: parseNumber(
       readConfigEnvOrThrow(configService, EmailEnvEnum.EMAIL_PORT),
       EmailEnvEnum.EMAIL_PORT,
-    ),
+    ), // 邮箱服务器端口
     secure: parseBoolean(
       readConfigEnvOrThrow(configService, EmailEnvEnum.EMAIL_SECURE),
       EmailEnvEnum.EMAIL_SECURE,
-    ),
-    authUser,
-    authPass: readConfigEnvOrThrow(configService, EmailEnvEnum.EMAIL_PASS),
-    from: readConfigEnvOrThrow(configService, EmailEnvEnum.EMAIL_FROM) ?? authUser,
+    ), // 邮箱服务器是否安全
+    authUser, // 邮箱服务器用户名
+    authPass: readConfigEnvOrThrow(configService, EmailEnvEnum.EMAIL_PASS), // 邮箱服务器密码
+    from: readConfigEnvOrThrow(configService, EmailEnvEnum.EMAIL_FROM) ?? authUser, // 邮箱服务器发件人
   };
 }
