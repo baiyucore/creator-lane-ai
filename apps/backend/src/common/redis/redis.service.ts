@@ -11,6 +11,8 @@ import { ConfigService } from '@nestjs/config';
 import Redis, { ChainableCommander, RedisOptions, RedisValue } from 'ioredis';
 import redisConfig, { RedisConfig } from '../../config/redis.config';
 
+// TODO : 要去了解这地方的作用，以及锁安全的问题
+
 interface RedisLockOptions {
   ttlMs?: number;
   retryDelayMs?: number;

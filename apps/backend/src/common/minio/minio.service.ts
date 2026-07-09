@@ -11,6 +11,8 @@ import type { BucketItem, BucketItemStat, ItemBucketMetadata } from 'minio';
 import minioConfig, { MinioConfig } from '@/config/minio.config';
 import { Readable } from 'node:stream';
 
+// TODO : 类似于云存储，可以上传下载文件，但是需要配置对应的存储桶，以及对应的访问密钥和密钥ID
+// TODO : 需要去稍微了解一点
 export interface MinioUploadOptions {
   bucket?: string;
   contentType?: string;

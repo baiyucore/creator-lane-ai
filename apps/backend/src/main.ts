@@ -54,11 +54,11 @@ async function bootstrap() {
   await registerFastifyPlugin(app, helmet, {
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ['self'],
-        scriptSrc: ['self', 'blob:'],
-        workerSrc: ['self', 'blob:'],
-        styleSrc: ['self', `'unsafe-inline'`],
-        imgSrc: ['self', 'data:', 'https:'],
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", 'blob:'],
+        workerSrc: ["'self'", 'blob:'],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
       },
     },
   });

@@ -6,6 +6,12 @@ import { RedisModule } from './common/redis/redis.module';
 import { MinioModule } from './common/minio/minio.module';
 import { EmailModule } from './common/email/email.module';
 import { LangfuseModule } from './common/langfuse/langfuse.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { TransformInterceptor } from './core/interceptor/transform.interceptor';
+import { LangfuseTraceInterceptor } from './core/interceptor/langfuse-trace.interceptor';
+import { HealthModule } from './api/health/health.module';
+import { UploadService } from './api/upload/upload.service';
+import { UploadModule } from './api/upload/upload.module';
 
 @Module({
   imports: [
@@ -18,7 +24,19 @@ import { LangfuseModule } from './common/langfuse/langfuse.module';
     MinioModule,
     EmailModule,
     LangfuseModule,
+    HealthModule,
+    UploadModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LangfuseTraceInterceptor,
+    },
+    UploadService,
+  ],
 })
 export class AppModule {}

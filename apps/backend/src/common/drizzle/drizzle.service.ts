@@ -5,6 +5,8 @@ import { resolveDatabaseUrl } from '@/utils/env';
 import * as schema from '../../schema';
 import { drizzle } from 'drizzle-orm/node-postgres';
 
+// TODO : 数据库ORM，需要去稍微了解一点
+
 @Injectable()
 export class DrizzleService implements OnModuleInit, OnModuleDestroy {
   private readonly pool: Pool;

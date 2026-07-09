@@ -1,4 +1,4 @@
-import ClientRequest from './request';
+import { ClientRequest } from './request';
 
 export async function logout() {
   return ClientRequest.post<{ success: boolean }>('/api/auth/logout');

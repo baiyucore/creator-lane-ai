@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { readConfigEnv } from '@/utils/env';
 import { LangfuseEnvEnum } from '../enum/langfuse.env.enum';
 
+// TODO : llm 的监控平台，需要去稍微了解一点
 interface TraceGeneratorOptions {
   input?: unknown;
   model?: string;
