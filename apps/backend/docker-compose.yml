@@ -7,7 +7,7 @@ services:
       - .env.development
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-hyt}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hyt0923}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-huyt0923}
       POSTGRES_DB: ${DATABASE_NAME:-ai_creation_platform_test}
     ports:
       - '5433:5432'
@@ -29,7 +29,7 @@ services:
       - .env.development
     environment:
       REDIS_PORT: ${REDIS_PORT:-6379}
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-hyt0923}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-huyt0923}
     ports:
       - '127.0.0.1:${REDIS_PORT:-6379}:6379'
     volumes:
@@ -61,7 +61,7 @@ services:
       - .env.development
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-hyt}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-hyt09230}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-huyt0923}
     command: server /data --console-address ":9001"
     ports:
       - '127.0.0.1:${MINIO_API_PORT:-9000}:9000'
@@ -75,7 +75,7 @@ services:
       - .env.development
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-hyt}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-hyt09230}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-huyt0923}
     depends_on:
       - minio
     volumes:
@@ -122,8 +122,8 @@ services:
       - '127.0.0.1:3030:3030'
     environment: &langfuse-env
       NEXTAUTH_URL: ${LANGFUSE_NEXTAUTH_URL:-http://127.0.0.1:3001}
-      DATABASE_URL: ${LANGFUSE_DATABASE_URL:-postgresql://hyt:hyt0923@postgres:5432/langfuse}
-      DIRECT_URL: ${LANGFUSE_DIRECT_URL:-postgresql://hyt:hyt0923@postgres:5432/langfuse}
+      DATABASE_URL: ${LANGFUSE_DATABASE_URL:-postgresql://hyt:huyt0923@postgres:5432/langfuse}
+      DIRECT_URL: ${LANGFUSE_DIRECT_URL:-postgresql://hyt:huyt0923@postgres:5432/langfuse}
       SALT: ${LANGFUSE_SALT:-replace-with-strong-random-salt}
       ENCRYPTION_KEY: ${LANGFUSE_ENCRYPTION_KEY:-0000000000000000000000000000000000000000000000000000000000000000}
       TELEMETRY_ENABLED: ${LANGFUSE_TELEMETRY_ENABLED:-false}
@@ -135,12 +135,12 @@ services:
       CLICKHOUSE_CLUSTER_ENABLED: ${LANGFUSE_CLICKHOUSE_CLUSTER_ENABLED:-false}
       REDIS_HOST: ${LANGFUSE_REDIS_HOST:-redis}
       REDIS_PORT: ${LANGFUSE_REDIS_PORT:-6379}
-      REDIS_AUTH: ${LANGFUSE_REDIS_AUTH:-hyt0923}
+      REDIS_AUTH: ${LANGFUSE_REDIS_AUTH:-huyt0923}
       REDIS_TLS_ENABLED: false
       LANGFUSE_S3_EVENT_UPLOAD_BUCKET: ${LANGFUSE_S3_EVENT_UPLOAD_BUCKET:-wallpaper}
       LANGFUSE_S3_EVENT_UPLOAD_REGION: ${LANGFUSE_S3_EVENT_UPLOAD_REGION:-us-east-1}
       LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: ${LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID:-hyt}
-      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY:-hyt09230}
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY:-huyt0923}
       LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: ${LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT:-http://minio:9000}
       LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: true
 

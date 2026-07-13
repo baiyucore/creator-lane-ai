@@ -70,6 +70,26 @@ export class ClientRequest {
   get<T>(url: string, params?: ClientParams<QueryParams>): Promise<RequestResult<T>> {
     return this.request<T>({ url, method: 'GET', ...params });
   }
+  post<T>(url: string, params?: ClientParams<BodyParams>): Promise<RequestResult<T>> {
+    return this.request<T>({ url, method: 'POST', ...params });
+  }
+  put<T>(url: string, params?: ClientParams<BodyParams>): Promise<RequestResult<T>> {
+    return this.request<T>({ url, method: 'PUT', ...params });
+  }
+  patch<T>(url: string, params?: ClientParams<BodyParams>): Promise<RequestResult<T>> {
+    return this.request<T>({ url, method: 'PATCH', ...params });
+  }
+  delete<T>(url: string, params?: ClientParams<QueryParams>): Promise<RequestResult<T>> {
+    return this.request<T>({ url, method: 'DELETE', ...params });
+  }
+
+  createCancelToken(): { signal: AbortSignal; cancel: () => void } {
+    const controller = new AbortController();
+    return {
+      signal: controller.signal,
+      cancel: () => controller.abort(),
+    };
+  }
 
   // 请求
   private async request<T>(props: ClientRequestProps): Promise<RequestResult<T>> {

@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { AuthProvider } from '../components/auth-provider';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '../components/theme-provider';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: '创作平台',
