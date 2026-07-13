@@ -12,6 +12,8 @@ import { LangfuseTraceInterceptor } from './core/interceptor/langfuse-trace.inte
 import { HealthModule } from './api/health/health.module';
 import { UploadService } from './api/upload/upload.service';
 import { UploadModule } from './api/upload/upload.module';
+import { AgentModule } from './agent/agent.module';
+import { WorksModule } from './api/works/works.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { UploadModule } from './api/upload/upload.module';
     LangfuseModule,
     HealthModule,
     UploadModule,
+    AgentModule,
+    WorksModule,
   ],
   providers: [
     {

@@ -9,6 +9,7 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
+
 import { workspaces } from './workspace.table';
 
 export const workspaceFileKindValues = ['file', 'folder'] as const;
@@ -22,8 +23,8 @@ export const workspaceFiles = pgTable(
       .notNull()
       .references(() => workspaces.id, { onDelete: 'cascade' }),
     parentId: uuid('parent_id'),
-    name: varchar('name', { length: 160 }).notNull(),
     kind: workspaceFileKindEnum('kind').notNull(),
+    name: varchar('name', { length: 160 }).notNull(),
     path: text('path').notNull(),
     content: jsonb('content'),
     contentText: text('content_text'),
@@ -31,13 +32,16 @@ export const workspaceFiles = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex('workspace_files_path_uq').on(table.workspaceId, table.path),
-    uniqueIndex('workspace_files_parent_id_name_uq').on(
+    uniqueIndex('workspace_files_workspace_path_uq').on(table.workspaceId, table.path),
+    uniqueIndex('workspace_files_workspace_parent_name_uq').on(
+      table.workspaceId,
       table.parentId,
       table.name,
-      table.workspaceId,
     ),
     index('workspace_files_workspace_kind_idx').on(table.workspaceId, table.kind),
     index('workspace_files_workspace_parent_idx').on(table.workspaceId, table.parentId),
   ],
 );
+
+export type WorkspaceFileModel = typeof workspaceFiles.$inferSelect;
+export type NewWorkspaceFileModel = typeof workspaceFiles.$inferInsert;
