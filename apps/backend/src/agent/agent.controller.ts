@@ -1,12 +1,23 @@
-import { Body, Controller, Req, Res } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Req, Res, HttpCode, Post } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FastifyRequest, FastifyReply } from 'fastify';
+
+import { SSE } from '@/core/decorator/sse.decorator';
+
+import { AgentStreamDto } from './dto/agent-stream.dto';
+import { AgentService } from './agent.service';
+import { openSseReply, writeSseEvent } from './stream/sse';
 
 @ApiTags('Agent')
 @Controller('ai/agent')
 export class AgentController {
   constructor(private readonly agentService: AgentService) {}
 
+  @Post('stream')
+  @HttpCode(200)
+  @SSE()
+  @ApiOperation({ summary: 'Stream agent response' })
+  @ApiBody({ type: AgentStreamDto })
   async stream(
     @Body() dto: AgentStreamDto,
     @Req() request: FastifyRequest,
@@ -15,7 +26,7 @@ export class AgentController {
     const abortController = new AbortController();
 
     request.raw.on('close', () => abortController.abort());
-    openSeeReply(reply, request);
+    openSseReply(reply, request);
 
     try {
       await this.agentService.stream(
