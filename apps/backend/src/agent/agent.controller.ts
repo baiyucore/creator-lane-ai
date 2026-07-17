@@ -32,7 +32,7 @@ export class AgentController {
       await this.agentService.stream(
         dto,
         (event) => {
-          writeSeeEvent(reply, event);
+          writeSseEvent(reply, event);
         },
         { signal: abortController.signal },
       );
